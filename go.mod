@@ -1,4 +1,4 @@
-module github.com/prv_telegrambot
+module prv_telegrambot
 
 go 1.24.9
 

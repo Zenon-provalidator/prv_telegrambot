@@ -7,24 +7,24 @@
     },
     "cosmos": {
       "rank": 25,
-      "staked": "2,697,467",
+      "staked": "2,697,502",
       "commission": "5"
     },
     "osmosis": {
       "rank": 48,
-      "staked": "2,286,350",
+      "staked": "2,286,368",
       "commission": "5"
     }
   },
   "pools": {
     "atomone": {
-      "bonded_tokens": "47269381523103"
+      "bonded_tokens": "47268751461123"
     },
     "cosmos": {
-      "bonded_tokens": "273502235593313"
+      "bonded_tokens": "273523177766648"
     },
     "osmosis": {
-      "bonded_tokens": "277041998026344"
+      "bonded_tokens": "277038474781654"
     }
   }
 }
