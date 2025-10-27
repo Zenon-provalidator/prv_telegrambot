@@ -1,0 +1,15 @@
+[Unit]
+Description=prv_telegrambot daemon
+After=network-online.target
+
+[Service]
+User=root
+WorkingDirectory=/root/go/src/github.com/prv_telegrambot
+ExecStart=/root/go/src/github.com/prv_telegrambot/main
+
+Restart=always
+RestartSec=3
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
