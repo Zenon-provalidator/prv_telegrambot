@@ -1,0 +1,17 @@
+{
+  "cosmos": {
+    "rest_prefix": "https://cosmos-rest.publicnode.com",
+    "moniker": "Provalidator",
+    "operator_address": "cosmosvaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xk0q50k"
+  },
+  "osmosis": {
+    "rest_prefix": "https://osmosis-rest.publicnode.com",
+    "moniker": "Provalidator",
+    "operator_address": "osmovaloper1gy0nyn2hscxxayj2pdyu8axmfvv75nnvhc079s"
+  },
+  "atomone": {
+    "rest_prefix": "https://atomone-rest.publicnode.com",
+    "moniker": "Provalidator",
+    "operator_address": "atonevaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xlxr0l9"
+  }
+}

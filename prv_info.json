@@ -1,0 +1,30 @@
+{
+  "validators": {
+    "atomone": {
+      "rank": 15,
+      "staked": "1,011,330",
+      "commission": "5"
+    },
+    "cosmos": {
+      "rank": 25,
+      "staked": "2,697,467",
+      "commission": "5"
+    },
+    "osmosis": {
+      "rank": 48,
+      "staked": "2,286,350",
+      "commission": "5"
+    }
+  },
+  "pools": {
+    "atomone": {
+      "bonded_tokens": "47269381523103"
+    },
+    "cosmos": {
+      "bonded_tokens": "273502235593313"
+    },
+    "osmosis": {
+      "bonded_tokens": "277041998026344"
+    }
+  }
+}
