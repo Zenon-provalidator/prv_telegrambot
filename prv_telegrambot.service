@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 User=root
 WorkingDirectory=/root/go/src/github.com/prv_telegrambot
-ExecStart=/root/go/src/github.com/prv_telegrambot/main
+ExecStart=/root/go/src/github.com/prv_telegrambot/main -prod=true
 
 Restart=always
 RestartSec=3

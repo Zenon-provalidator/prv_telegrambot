@@ -53,11 +53,18 @@ var ChainMetadata = map[string]ChainMeta{
 }
 
 // 봇 토큰 로드 함수
-func LoadBotToken() string {
-	//token := "8220707682:AAG0wUjwgXaWoWJ3bVlsjDQ3TC5l2KBbNhk" //
-	token := "2100284989:AAHGootU-e-ZQeAurkgHa_zunlWbx_1F1DY"
-	if token == "" {
-		log.Fatal("Error: TELEGRAM_BOT_TOKEN environment variable not set.")
+
+func LoadBotToken(isProduction bool) string { // 💡 isProduction 플래그를 받도록 수정
+	LocalDevToken := "2100284989:AAHGootU-e-ZQeAurkgHa_zunlWbx_1F1DY"
+	ProductionToken := "8220707682:AAG0wUjwgXaWoWJ3bVlsjDQ3TC5l2KBbNhk"
+
+	// 플래그를 확인하여 환경별 토큰을 사용 (LocalDevToken과 ProductionToken은 config.go에 정의되어 있다고 가정)
+	if isProduction {
+		log.Println("Using Production Token based on flag.")
+		return ProductionToken
 	}
-	return token
+
+	// 로컬 개발 환경으로 간주
+	log.Println("Using Local Development Token.")
+	return LocalDevToken
 }

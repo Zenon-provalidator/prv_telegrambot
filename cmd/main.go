@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"math"
@@ -280,8 +281,10 @@ func generatePhotonMessage() (string, error) {
 }
 
 func main() {
-	// 봇 토큰 설정
-	botToken := config.LoadBotToken()
+	// 봇 토큰 설정 기본값은 false (개발 환경)
+	prodFlag := flag.Bool("prod", false, "Set to true to use production token (e.g., -prod=true)")
+	flag.Parse() // 실행 시 전달된 인자를 파싱
+	botToken := config.LoadBotToken(*prodFlag)
 
 	// 데이터 수집기 초기화 및 고루틴 시작
 	collector := api.NewDataCollector()
