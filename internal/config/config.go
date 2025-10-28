@@ -35,16 +35,24 @@ type ChainMeta struct {
 }
 
 // 모든 명령어 및 메타데이터 정의
+//var ChainMetadata = map[string]ChainMeta{
+//	"cosmos":  {"cosmos", "⚛️", "Cosmos", "ATOM"},
+//	"osmosis": {"osmosis", "🧪", "Osmosis", "OSMO"},
+//	"atomone": {"atomone", "🪐", "AtomOne", "ATONE"},
+//	"photon":  {"photon-2", "🛰", "PHOTON", "PHOTON"},
+//}
+
 var ChainMetadata = map[string]ChainMeta{
-	"cosmos":  {"cosmos", "⚛️", "Cosmos", "ATOM"},
-	"osmosis": {"osmosis", "🧪", "Osmosis", "OSMO"},
-	"atomone": {"atomone", "🪐", "AtomOne", "ATONE"},
-	"photon":  {"photon-2", "🛰", "PHOTON", "PHOTON"},
+	"cosmos":  {"cosmos", "⚛️", "코스모스", "ATOM"},
+	"osmosis": {"osmosis", "🧪", "오스모시스", "OSMO"},
+	"atomone": {"atomone", "🪐", "아톰원", "ATONE"},
+	"photon":  {"photon-2", "🛰", "포톤", "PHOTON"},
 }
 
 // 봇 토큰 로드 함수
 func LoadBotToken() string {
-	token := "8220707682:AAG0wUjwgXaWoWJ3bVlsjDQ3TC5l2KBbNhk" //"2100284989:AAHGootU-e-ZQeAurkgHa_zunlWbx_1F1DY"
+	token := "8220707682:AAG0wUjwgXaWoWJ3bVlsjDQ3TC5l2KBbNhk" //
+	//token := "2100284989:AAHGootU-e-ZQeAurkgHa_zunlWbx_1F1DY"
 	if token == "" {
 		log.Fatal("Error: TELEGRAM_BOT_TOKEN environment variable not set.")
 	}

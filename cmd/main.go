@@ -183,7 +183,31 @@ func generateChainMessage(
 	marketCapStr := formatNumber(marketCapUSD)
 	fdvStr := formatNumber(fullyDilutedValuationUSD)
 	volumeStr := formatNumber(totalVolumeUSD)
+	/*
+	   `
+	   %s <b>%s ($%s)</b>
+	   ----------------------------------------
 
+	   <b>$%s: $%s</b>%s
+
+	   💵 Market Cap: $%s
+
+	   🏛️ FDV: $%s
+
+	   📊 Volume(24h): $%s
+
+	   <b>Stake $%s with ❤️Provalidator</b>
+
+	   <b>🏆Validator Ranking: #%d</b>
+
+	   <b>🔖Commission: %s%%</b>
+
+	   <b>🤝Staked: %s %s</b>
+
+	   ----------------------------------------
+	   Supported by <a href='https://provalidator.com' target='_blank'>Provalidator</a>
+	   `
+	*/
 	// 4. 최종 HTML 메시지 생성
 	htmlMessage := fmt.Sprintf(`
 %s <b>%s ($%s)</b>
@@ -197,16 +221,16 @@ func generateChainMessage(
 
 📊 Volume(24h): $%s
 
-<b>Stake $%s with ❤️Provalidator</b>
+<b>프로밸리와 $%s  스테이킹 하세요❤️</b>
 
-<b>🏆Validator Ranking: #%d</b>
+<b>🏆검증인 순위: #%d</b>
 
-<b>🔖Commission: %s%%</b>
+<b>🔖수수료: %s%%</b>
 
-<b>🤝Staked: %s %s</b>
+<b>🤝위임량: %s %s</b>
 
 ----------------------------------------
-Supported by <a href='https://provalidator.com' target='_blank'>Provalidator</a>
+프로밸리(<a href='https://provalidator.com' target='_blank'>Provalidator</a>) 검증인 만듦
 `,
 		meta.Emoji, meta.TokenName, meta.Ticker,
 		meta.Ticker, priceUSDStr,
