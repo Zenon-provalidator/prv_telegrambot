@@ -239,7 +239,7 @@ func generateChainMessage(
 
 📊 Volume(24h): $%s
 
-<b>프로밸리와 $%s  스테이킹 하세요❤️</b>
+<b>프로밸리와 $%s  스테이킹하세요❤️</b>
 
 <b>🏆검증인 순위: #%d</b>
 
