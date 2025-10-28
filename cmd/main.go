@@ -228,7 +228,7 @@ func generateChainMessage(
 	// 4. 최종 HTML 메시지 생성
 	htmlMessage := fmt.Sprintf(`
 %s <b>%s ($%s)</b>
-----------------------------------------
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 <b>$%s: $%s</b>%s
 
@@ -246,8 +246,8 @@ func generateChainMessage(
 
 <b>🤝위임량: %s %s</b>
 
-----------------------------------------
-프로밸리(<a href='https://provalidator.com' target='_blank'>Provalidator</a>) 검증인 만듦
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<b>프로밸리(<a href='https://provalidator.com' target='_blank'>Provalidator</a>) 검증인 만듦</b>
 `,
 		meta.Emoji, meta.TokenName, meta.Ticker,
 		meta.Ticker, priceDisplayStr,
