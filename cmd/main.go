@@ -253,7 +253,7 @@ func generateChainMessage(
 		meta.Ticker, priceDisplayStr,
 		stakingRatioLine,
 		marketCapStr, fdvStr, volumeStr,
-		meta.Ticker,
+		meta.StakingTicker,
 		prvInfo.Rank, prvInfo.Commission,
 		prvInfo.Staked, stakedTokenDisplay,
 	)
