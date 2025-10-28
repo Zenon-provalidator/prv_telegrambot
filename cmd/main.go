@@ -140,6 +140,23 @@ func generateChainMessage(
 		return "", fmt.Errorf("%s data not found in CoinGecko JSON", meta.TokenName)
 	}
 
+	// 1. 환율 가져오기 및 원화 가격 계산 💡
+	krwRate := data.Prv.USDtoKRWRate
+	if krwRate <= 0 {
+		krwRate = config.DefaultUSDtoKRWRate // 안전 장치
+	}
+
+	currentPriceUSD := tokenData.CurrentPrice
+	krwPrice := currentPriceUSD * krwRate
+
+	// 원화는 정수로 표시하기 위해 반올림 후 포맷팅
+	krwPriceRounded := math.Round(krwPrice)
+	krwPriceStr := formatNumber(krwPriceRounded)
+
+	priceUSDStr := fmt.Sprintf("%.2f", currentPriceUSD)
+	// 최종 가격 표시 문자열: "$3.18 (5,000원)"
+	priceDisplayStr := fmt.Sprintf("%s <b>(%s원)</b>", priceUSDStr, krwPriceStr)
+
 	// 검증인 및 풀 정보 키 설정 (Photon은 AtomOne 사용)
 	validatorInfoKey := chainID
 	poolChainID := chainID
@@ -173,13 +190,13 @@ func generateChainMessage(
 	}
 
 	// 3. CoinGecko 데이터 포맷팅
-	currentPriceUSD := tokenData.CurrentPrice
+	//currentPriceUSD := tokenData.CurrentPrice
 	marketCapUSD := tokenData.MarketCap
 	totalVolumeUSD := tokenData.TotalVolume
 
 	fullyDilutedValuationUSD := calculateFDV(tokenData)
 
-	priceUSDStr := fmt.Sprintf("%.2f", currentPriceUSD)
+	//priceUSDStr := fmt.Sprintf("%.2f", currentPriceUSD)
 	marketCapStr := formatNumber(marketCapUSD)
 	fdvStr := formatNumber(fullyDilutedValuationUSD)
 	volumeStr := formatNumber(totalVolumeUSD)
@@ -233,7 +250,7 @@ func generateChainMessage(
 프로밸리(<a href='https://provalidator.com' target='_blank'>Provalidator</a>) 검증인 만듦
 `,
 		meta.Emoji, meta.TokenName, meta.Ticker,
-		meta.Ticker, priceUSDStr,
+		meta.Ticker, priceDisplayStr,
 		stakingRatioLine,
 		marketCapStr, fdvStr, volumeStr,
 		meta.Ticker,

@@ -11,6 +11,7 @@ const DataDir = "data"
 const CoingeckoAPIURL = "https://api.coingecko.com/api/v3/coins/markets?ids=cosmos,osmosis,atomone,photon-2&vs_currency=usd"
 const StakingValidatorsEndpoint = "/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED&pagination.limit=10000"
 const StakingPoolEndpoint = "/cosmos/staking/v1beta1/pool"
+const ExchangeRateAPIURL = "https://open.er-api.com/v6/latest/USD" // 💡 환율 API 추가
 
 // 파일 경로 상수 (DataDir 사용)
 const CoingeckoDataFile = DataDir + "/coingecko_data.json"
@@ -19,6 +20,7 @@ const PrvInfoFile = DataDir + "/prv_info.json"
 
 // 통화/계산 상수
 const MicroDenomMultiplier = 1_000_000.0
+const DefaultUSDtoKRWRate = 1400.0 // 💡 환율 API 에러 시 사용할 기본값
 
 // ChainConfigV2 구조체: prv_validators.json 파일 구조
 type ValidatorConfig struct {

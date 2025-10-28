@@ -18,13 +18,17 @@ import (
 
 // DataCollector: 모든 데이터 수집 및 관리를 담당하는 메인 구조체
 type DataCollector struct {
-	mutex            sync.RWMutex
+	mutex            sync.RWMutex // For validatorConfigs and file writing
+	rateMutex        sync.RWMutex // 💡 환율 접근을 위한 새 뮤텍스
 	validatorConfigs map[string]config.ValidatorConfig
+	USDtoKRWRate     float64 // 💡 메모리에 저장된 환율
 }
 
 // NewDataCollector: DataCollector 인스턴스 초기화
 func NewDataCollector() *DataCollector {
-	dc := &DataCollector{}
+	dc := &DataCollector{
+		USDtoKRWRate: config.DefaultUSDtoKRWRate, // 💡 기본 환율로 초기화
+	}
 	if err := dc.loadValidatorConfigs(); err != nil {
 		log.Fatalf("Fatal error loading validator configs: %v", err)
 	}
@@ -63,6 +67,7 @@ func (dc *DataCollector) loadValidatorConfigs() error {
 func (dc *DataCollector) RunCollectors() {
 	go dc.runCoingeckoDataCollector()
 	go dc.runPrvDataCollector()
+	go dc.runExchangeRateCollector() // 💡 환율 수집기 추가
 }
 
 // runCoingeckoDataCollector: 1분마다 코인 가격 정보를 저장
@@ -74,6 +79,20 @@ func (dc *DataCollector) runCoingeckoDataCollector() {
 		select {
 		case <-ticker.C:
 			dc.collectAndSaveCoingeckoData()
+		}
+	}
+}
+
+// runExchangeRateCollector: 1시간마다 환율을 업데이트
+func (dc *DataCollector) runExchangeRateCollector() {
+	// 초기 실행 시 바로 환율 업데이트
+	dc.fetchAndStoreRate()
+
+	ticker := time.NewTicker(1 * time.Hour) // 💡 1시간 간격 설정
+	for {
+		select {
+		case <-ticker.C:
+			dc.fetchAndStoreRate()
 		}
 	}
 }
@@ -122,9 +141,15 @@ func (dc *DataCollector) runPrvDataCollector() {
 func (dc *DataCollector) collectAndSavePrvInfo() {
 	log.Println("Starting Provalidator info collection...")
 
+	// 💡 메모리의 최신 환율을 가져와 컨테이너에 포함
+	dc.rateMutex.RLock()
+	currentRate := dc.USDtoKRWRate
+	dc.rateMutex.RUnlock()
+
 	container := model.PrvDataContainer{
-		Validators: make(map[string]model.PrvInfo),
-		Pools:      make(map[string]model.StakingPoolInfo),
+		Validators:   make(map[string]model.PrvInfo),
+		Pools:        make(map[string]model.StakingPoolInfo),
+		USDtoKRWRate: currentRate, // 💡 환율 값 저장
 	}
 
 	for chainID, cfg := range dc.validatorConfigs {
@@ -155,6 +180,59 @@ func (dc *DataCollector) collectAndSavePrvInfo() {
 		return
 	}
 	log.Printf("Provalidator info successfully saved to %s", config.PrvInfoFile)
+}
+
+// fetchAndStoreRate: API 호출로 환율을 가져와 메모리에 저장하고, prv_info.json 파일을 업데이트
+func (dc *DataCollector) fetchAndStoreRate() {
+	rate, err := fetchRate(config.ExchangeRateAPIURL)
+	if err != nil {
+		log.Printf("Error fetching USD/KRW rate: %v. Using previous rate (%.2f).", err, dc.USDtoKRWRate)
+		return // 에러 발생 시 기존 환율 유지
+	}
+
+	// 메모리 환율 업데이트
+	dc.rateMutex.Lock()
+	dc.USDtoKRWRate = rate
+	dc.rateMutex.Unlock()
+	log.Printf("USD/KRW rate successfully updated to %.2f", rate)
+
+	// 환율이 업데이트될 때마다 파일 저장 로직 실행
+	dc.collectAndSavePrvInfo()
+}
+
+// fetchRate: ExchangeRate-API를 호출하여 USD/KRW 환율을 반환하는 헬퍼 함수
+func fetchRate(apiURL string) (float64, error) {
+	type ExchangeRateResponse struct {
+		Result string             `json:"result"`
+		Rates  map[string]float64 `json:"rates"`
+	}
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		return 0, fmt.Errorf("API 요청 오류: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, fmt.Errorf("API 응답 코드 오류: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return 0, fmt.Errorf("응답 본문 읽기 오류: %w", err)
+	}
+
+	var data ExchangeRateResponse
+	if err := json.Unmarshal(body, &data); err != nil {
+		return 0, fmt.Errorf("JSON 파싱 오류: %w", err)
+	}
+
+	rate, ok := data.Rates["KRW"]
+	if !ok {
+		return 0, fmt.Errorf("응답 데이터에서 KRW 환율을 찾을 수 없음")
+	}
+
+	return rate, nil
 }
 
 // fetchStakingPoolInfo: /staking/v1beta1/pool API에서 BondedTokens 원시 값을 가져옴

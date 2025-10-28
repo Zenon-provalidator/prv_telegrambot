@@ -47,6 +47,7 @@ type PrvInfo struct {
 
 // PrvDataContainer: prv_info.json에 저장될 전체 데이터 구조
 type PrvDataContainer struct {
-	Validators map[string]PrvInfo         `json:"validators"`
-	Pools      map[string]StakingPoolInfo `json:"pools"`
+	Validators   map[string]PrvInfo         `json:"validators"`
+	Pools        map[string]StakingPoolInfo `json:"pools"`
+	USDtoKRWRate float64                    `json:"usd_to_krw_rate"` // 💡 환율 필드 추가
 }
