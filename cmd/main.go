@@ -22,6 +22,46 @@ type AllData struct {
 	Prv       model.PrvDataContainer
 }
 
+// Global State to track the last bot message ID
+var lastBotMessage map[int64]int
+
+// saveLastMessage: 마지막 봇 메시지 정보를 JSON 파일에 저장
+func saveLastMessage() {
+	// 맵이 초기화되지 않았다면 저장하지 않음
+	if lastBotMessage == nil {
+		return
+	}
+	data, err := json.Marshal(lastBotMessage)
+	if err != nil {
+		log.Printf("Error marshalling lastBotMessage map: %v", err)
+		return
+	}
+	_ = os.WriteFile(config.LastMessageFile, data, 0644)
+}
+
+// loadLastMessage: JSON 파일에서 맵을 불러오거나, 파일이 없으면 새 맵 초기화
+func loadLastMessage() {
+	data, err := os.ReadFile(config.LastMessageFile)
+	if err != nil {
+		// 파일이 없거나 오류 발생 시, 빈 맵으로 초기화
+		log.Printf("Warning: Failed to read last_message.json. Initializing new map: %v", err)
+		lastBotMessage = make(map[int64]int)
+		return
+	}
+
+	// 파일에서 불러오기
+	if err := json.Unmarshal(data, &lastBotMessage); err != nil {
+		log.Printf("Error unmarshalling last_message.json. Initializing new map: %v", err)
+		lastBotMessage = make(map[int64]int) // 파싱 실패 시 초기화
+		return
+	}
+	// 성공적으로 불러왔더라도 맵이 nil일 수 있으므로 확인
+	if lastBotMessage == nil {
+		lastBotMessage = make(map[int64]int)
+	}
+	log.Printf("Successfully loaded last messages for %d chats.", len(lastBotMessage))
+}
+
 // loadAllData: 모든 JSON 파일에서 데이터를 읽어오는 헬퍼 함수
 func loadAllData() (AllData, error) {
 	var data AllData
@@ -290,6 +330,9 @@ func main() {
 	collector := api.NewDataCollector()
 	collector.RunCollectors()
 
+	// 마지막 메시지 정보 로드
+	loadLastMessage()
+
 	// 텔레그램 봇 로직 시작
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -307,7 +350,24 @@ func main() {
 			continue
 		}
 
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+		currentChatID := update.Message.Chat.ID
+
+		// 💡 맵에서 현재 채팅방의 이전 메시지 ID를 확인
+		if lastMessageID, ok := lastBotMessage[currentChatID]; ok && lastMessageID != 0 {
+
+			deleteConfig := tgbotapi.NewDeleteMessage(currentChatID, lastMessageID)
+
+			// 삭제 실패는 치명적이지 않으므로 에러는 로깅만
+			if _, err := bot.Request(deleteConfig); err != nil {
+				log.Printf("Chat %d: Failed to delete previous message %d: %v", currentChatID, lastMessageID, err)
+			}
+
+			// 삭제 시도 후, 맵에서 해당 채팅방의 메시지 ID를 0으로 초기화
+			lastBotMessage[currentChatID] = 0
+			go saveLastMessage() // 비동기로 파일에 저장
+		}
+
+		msg := tgbotapi.NewMessage(currentChatID, "")
 
 		var message string
 		var msgErr error
@@ -349,8 +409,12 @@ func main() {
 			msg.ParseMode = tgbotapi.ModeHTML
 		}
 
-		if _, err := bot.Send(msg); err != nil {
+		if sentMsg, err := bot.Send(msg); err != nil {
 			log.Println("Error sending message:", err)
+		} else {
+			// 💡 새로운 메시지 전송 성공 시, 전역 변수 업데이트 후 파일에 저장
+			lastBotMessage[sentMsg.Chat.ID] = sentMsg.MessageID
+			go saveLastMessage() // 비동기로 파일에 저장 (메인 루프 차단 방지)
 		}
 	}
 }

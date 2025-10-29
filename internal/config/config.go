@@ -17,6 +17,7 @@ const ExchangeRateAPIURL = "https://open.er-api.com/v6/latest/USD" // 💡 환�
 const CoingeckoDataFile = DataDir + "/coingecko_data.json"
 const PrvValidatorsFile = "prv_validators.json" // 설정 파일은 루트에 유지
 const PrvInfoFile = DataDir + "/prv_info.json"
+const LastMessageFile = DataDir + "/last_message.json"
 
 // 통화/계산 상수
 const MicroDenomMultiplier = 1_000_000.0
